@@ -117,7 +117,7 @@ input, select, button {
             <option value="0.00069">YouTube Music</option>
         </select>
         <button class="animate-on-load" onclick="calculateRoyalty()">Calculate</button>
-        <p id="result"></p>
+        <p id="result">$0.00</p>
     </div>
 
     <script>
@@ -125,11 +125,9 @@ function calculateRoyalty() {
     var streamsInput = document.getElementById('streams').value;
     var rate = document.getElementById('platform').value;
 
-    // Convert strings to numbers, defaulting to zero if conversion fails
     var streams = parseFloat(streamsInput);
     rate = parseFloat(rate);
 
-    // Ensure we're working with valid numbers
     if (isNaN(streams) || streams <= 0) {
         streams = 0;
     }
@@ -139,12 +137,29 @@ function calculateRoyalty() {
 
     var result = streams * rate;
 
-    // Make sure the animation function properly handles zero and does not animate if not necessary
     if (result > 0) {
         animateValue("result", 0, result, 800);
     } else {
         document.getElementById('result').innerText = `$0.00`;
     }
+}
+
+function animateValue(id, start, end, duration) {
+    let obj = document.getElementById(id);
+    let range = end - start;
+    let minTimer = 50; // Minimum frame rate delay (ms)
+    let stepTime = Math.abs(Math.floor(duration / range));
+    stepTime = Math.max(stepTime, minTimer); // Ensure not faster than the frame rate
+    let current = start;
+    let increment = end > start ? 1 : -1;
+    let timer = setInterval(function() {
+        current += increment;
+        obj.innerText = `$${current.toFixed(2)}`;
+        if (current == end) {
+            clearInterval(timer);
+            obj.innerText = `$${end.toFixed(2)}`; // Ensure it ends exactly at 'end'
+        }
+    }, stepTime);
 }
 
 
