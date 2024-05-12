@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Royalty Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: black;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(149, 94, 255, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 12px 10px;
+            margin-top: 12px;
+            background-color: #ffffff;
+            color: black;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            border: none; /* Removing borders */
+        }
+        select:focus {
+    outline: none;  /* Removes the default focus outline */
+    box-shadow: 0 0 0 2px #955eff; /* Custom focus indicator using a box-shadow that matches your theme color */
+}
+
+        input {
+            background-color: #ffffff; /* Ensuring background color for visibility */
+        }
+
+        input:focus {
+    outline: none;  /* Removes the default focus outline */
+    box-shadow: 0 0 0 2px #955eff; /* Custom focus indicator using a box-shadow that matches your theme color */
+}
+
+        select {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="black" d="M7 10l5 5 5-5z"/></svg>') no-repeat, #ffffff;
+            background-position: right 10px top 50%, 0 0;
+            background-size: 12px, 100%;
+            font-weight: bold;
+        }
+        button {
+            background-color: #955eff;
+            color: white;
+            transition: transform 0.3s ease;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #7a33ff;
+        }
+        /* Targeting input, select, and button elements specifically */
+input, select, button {
+    font-family: 'Poppins', sans-serif;
+}
+
+        p {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 50px;
+            font-weight: 500;
+            color: #955eff;
+        }
+        h1 {
+            font-weight: normal;
+        }
+        h1 b {
+            font-weight: bold;
+        }
+        @keyframes fadeInScale {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .animate-on-load {
+            animation: fadeInScale 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Streaming Royalty <b>Calculator</b></h1>
+        <input type="number" id="streams" placeholder="Number of streams">
+        <select id="platform" onchange="updateBorderColor(this)">
+            <option value="0.004">Spotify</option>
+            <option value="0.0072">Apple Music</option>
+            <option value="0.012">Amazon Music</option>
+            <option value="0.0068">Deezer</option>
+            <option value="0.00069">YouTube Music</option>
+        </select>
+        <button class="animate-on-load" onclick="calculateRoyalty()">Calculate</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+function calculateRoyalty() {
+    var streamsInput = document.getElementById('streams').value;
+    var rate = document.getElementById('platform').value;
+
+    // Convert strings to numbers, defaulting to zero if conversion fails
+    var streams = parseFloat(streamsInput);
+    rate = parseFloat(rate);
+
+    // Ensure we're working with valid numbers
+    if (isNaN(streams) || streams <= 0) {
+        streams = 0;
+    }
+    if (isNaN(rate)) {
+        rate = 0;
+    }
+
+    var result = streams * rate;
+
+    // Make sure the animation function properly handles zero and does not animate if not necessary
+    if (result > 0) {
+        animateValue("result", 0, result, 800);
+    } else {
+        document.getElementById('result').innerText = `$0.00`;
+    }
+}
+
+
+
+        function updateBorderColor(selectElement) {
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            selectElement.style.borderColor = color;
+        }
+
+        function animateValue(id, start, end, duration) {
+            let range = end - start;
+            let current = start;
+            let increment = (end - start) / duration * 10;
+            let stepTime = 10;
+            let obj = document.getElementById(id);
+            let timer = setInterval(function() {
+                current += increment;
+                obj.innerText = `$${current.toFixed(2)}`;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    clearInterval(timer);
+                    obj.innerText = `$${end.toFixed(2)}`; // Ensure it ends exactly at 'end'
+                }
+            }, stepTime);
+        }
+    </script>
+</body>
+</html>
