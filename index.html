@@ -41,25 +41,15 @@
             cursor: pointer;
             border: none; /* Removing borders */
         }
-        select:focus {
-    outline: none;  /* Removes the default focus outline */
-    box-shadow: 0 0 0 2px #955eff; /* Custom focus indicator using a box-shadow that matches your theme color */
-}
-
-        input {
-            background-color: #ffffff; /* Ensuring background color for visibility */
+        select:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #955eff; /* Custom focus indicator */
         }
-
-        input:focus {
-    outline: none;  /* Removes the default focus outline */
-    box-shadow: 0 0 0 2px #955eff; /* Custom focus indicator using a box-shadow that matches your theme color */
-}
-
         select {
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="black" d="M7 10l5 5 5-5z"/></svg>') no-repeat, #ffffff;
-    background-position: right 10px top 50%; /* Adjust this if necessary */
-    background-size: 20px; /* Increase this to make the arrow bigger */
-    font-weight: bold;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="black" d="M7 10l5 5 5-5z"/></svg>') no-repeat, #ffffff;
+            background-position: right 10px top 50%;
+            background-size: 20px;
+            font-weight: bold;
         }
         button {
             background-color: #955eff;
@@ -72,11 +62,6 @@
         button:hover {
             background-color: #7a33ff;
         }
-        /* Targeting input, select, and button elements specifically */
-input, select, button {
-    font-family: 'Poppins', sans-serif;
-}
-
         p {
             margin-top: 15px;
             margin-bottom: 10px;
@@ -90,72 +75,69 @@ input, select, button {
         h1 b {
             font-weight: bold;
         }
-        @keyframes fadeInScale {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
         .animate-on-load {
-            animation: fadeInScale 0.5s ease-out forwards;
+            animation: fadeInScale 0.2s ease-out forwards;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Streaming Royalty <b>Calculator</b></h1>
-        <input type="number" id="streams" placeholder="Number of streams">
+        <input type="number" id="streams" placeholder="Number of streams" onkeypress="handleEnter(event)">
         <select id="platform" onchange="updateBorderColor(this)">
-            <option value="0.004">Spotify</option>
-            <option value="0.0072">Apple Music</option>
-            <option value="0.012">Amazon Music</option>
-            <option value="0.0068">Deezer</option>
-            <option value="0.00069">YouTube Music</option>
+            <option value="0.00437">Spotify</option>
+            <option value="0.01">Apple Music</option>
+            <option value="0.00402">Amazon Music</option>
+            <option value="0.0064">Deezer</option>
+            <option value="0.00069">YouTube</option>
+            <option value="0.00133">Pandora</option>
         </select>
         <button class="animate-on-load" onclick="calculateRoyalty()">Calculate</button>
+        <label for="result" style="color: #FFFFFF; font-size: 20px;">Estimated royalties:</label>
         <p id="result">$0.00</p>
     </div>
 
     <script>
-function calculateRoyalty() {
-    var streamsInput = document.getElementById('streams').value;
-    var rate = document.getElementById('platform').value;
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                calculateRoyalty();
+            }
+        }
 
-    var streams = parseFloat(streamsInput);
-    rate = parseFloat(rate);
+        function calculateRoyalty() {
+            var streamsInput = document.getElementById('streams').value;
+            var rate = document.getElementById('platform').value;
 
-    if (isNaN(streams) || streams <= 0) {
-        streams = 0;
-    }
-    if (isNaN(rate)) {
-        rate = 0;
-    }
+            var streams = parseFloat(streamsInput);
+            rate = parseFloat(rate);
 
-    var result = streams * rate;
+            if (isNaN(streams) || streams <= 0) {
+                streams = 0;
+            }
+            if (isNaN(rate)) {
+                rate = 0;
+            }
 
-    if (result > 0) {
-        animateValue("result", 0, result, 800);
-    } else {
-        document.getElementById('result').innerText = `$0.00`;
-    }
-}
+            var result = streams * rate;
 
-function animateValue(id, start, end, duration) {
+            if (result > 0) {
+                animateValue("result", 0, result, 800);
+            } else {
+                document.getElementById('result').innerText = `$0.00`;
+            }
+        }
+
+        function animateValue(id, start, end, duration) {
     let obj = document.getElementById(id);
-    let range = end - start;
-    let minTimer = 50; // Minimum frame rate delay (ms)
-    let stepTime = Math.abs(Math.floor(duration / range));
-    stepTime = Math.max(stepTime, minTimer); // Ensure not faster than the frame rate
     let current = start;
-    let increment = end > start ? 1 : -1;
+    let range = end - start;
+    let increment = range / 50; // Divide range by the number of steps you want in 500ms
+    let stepTime = duration / 50; // Fixed number of steps within the 500ms duration
+
     let timer = setInterval(function() {
         current += increment;
         obj.innerText = `$${current.toFixed(2)}`;
-        if (current == end) {
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
             clearInterval(timer);
             obj.innerText = `$${end.toFixed(2)}`; // Ensure it ends exactly at 'end'
         }
@@ -163,27 +145,10 @@ function animateValue(id, start, end, duration) {
 }
 
 
-
         function updateBorderColor(selectElement) {
             var selectedOption = selectElement.options[selectElement.selectedIndex];
             var color = selectedOption.getAttribute('data-color');
             selectElement.style.borderColor = color;
-        }
-
-        function animateValue(id, start, end, duration) {
-            let range = end - start;
-            let current = start;
-            let increment = (end - start) / duration * 10;
-            let stepTime = 10;
-            let obj = document.getElementById(id);
-            let timer = setInterval(function() {
-                current += increment;
-                obj.innerText = `$${current.toFixed(2)}`;
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    clearInterval(timer);
-                    obj.innerText = `$${end.toFixed(2)}`; // Ensure it ends exactly at 'end'
-                }
-            }, stepTime);
         }
     </script>
 </body>
